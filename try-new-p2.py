@@ -83,7 +83,7 @@ if x and y:
     b['exc_diffrence'] = (b['exc'].shift(-1)-b['exc']  ) / b['exc'].shift(-1)
 
     b['Color'] = 'dodgerblue'
-    b.loc[b['exc_diffrence'] > 0.15, 'Color'] = 'red'
+    b.loc[b['exc_diffrence'] >= 0.15, 'Color'] = 'red'
 
 
     # fig_2 = go.Figure()
