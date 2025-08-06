@@ -78,7 +78,7 @@ if x:
             )
         )
     )
- bar_trace_50 = go.Bar(
+    bar_trace_50 = go.Bar(
         name='50',
         x=E['StopSequence'],
         y=E['value'] - B['value'],
@@ -242,6 +242,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 
