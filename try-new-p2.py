@@ -2,7 +2,6 @@ import pandas as pd
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-
 import plotly.graph_objects as go
 
 st.title("Reliability sketch")
@@ -75,30 +74,37 @@ if x:
                 y=0.2,
                 len=0.8,
                 thickness=15
+            ),
+            line=dict(  # Correct placement for border styling
+                color='blue',  # Border color
+                width=2  # Border width
             )
         )
     )
+
     bar_trace_50 = go.Bar(
         name='50',
         x=E['StopSequence'],
         y=E['value'] - B['value'],
         base=B['value'],
         marker=dict(
-            color=E['grade'],
+            color=E['grade'],  # Keep the bar fill color from the colorscale
             colorscale='Greens',
             cmin=0,
             cmax=100,
-            showscale=False  # Hide this second colorbar
+            showscale=False,  # Hide this color scale
+            line=dict(         # Correct placement for border styling
+                color='blue',  # Border color
+                width=2            # Border width
+            )
         ),
         text=E['value'].round(),
-     
         textposition='inside',
         textfont=dict(
-            size=12,  # Set the desired font size
-            color="black"  # Optional: set text color for readability
+            size=12,          # Font size
+            color="black"     # Text color
         )
     )
-
 
     bar_trace_20_80 = go.Bar(
         name='20-80',
@@ -110,7 +116,11 @@ if x:
             colorscale='Greens',
             cmin=0,
             cmax=100,
-            showscale=False  # Hide this second colorbar
+            showscale=False,  # Hide this second colorbar
+            line=dict(  # Correct placement for border styling
+                color='blue',  # Border color
+                width=2  # Border width
+            )
         ), visible='legendonly'
         # Optional: set text color for readability
     )
@@ -125,7 +135,11 @@ if x:
             colorscale='Greens',
             cmin=0,
             cmax=100,
-            showscale=False  # Hide this second colorbar
+            showscale=False,  # Hide this second colorbar
+            line=dict(  # Correct placement for border styling
+                color='blue',  # Border color
+                width=2  # Border width
+            )
         ), visible='legendonly'
         # Optional: set text color for readability
     )
@@ -140,7 +154,11 @@ if x:
             colorscale='Greens',
             cmin=0,
             cmax=100,
-            showscale=False  # Hide this second colorbar
+            showscale=False,  # Hide this second colorbar
+            line=dict(  # Correct placement for border styling
+                color='blue',  # Border color
+                width=2  # Border width
+            )
         ), visible='legendonly'
         # Optional: set text color for readability
     )
@@ -243,18 +261,3 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
