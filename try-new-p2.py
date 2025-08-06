@@ -91,8 +91,7 @@ if x:
             showscale=False  # Hide this second colorbar
         ),
         text=E['value'].round(),
-        line=dict(color="white", width=1),  
-
+     
         textposition='inside',
         textfont=dict(
             size=12,  # Set the desired font size
@@ -244,6 +243,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 
