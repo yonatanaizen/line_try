@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from adodbapi.ado_consts import directions
 
 st.title("Reliability sketch")
 x = st.file_uploader("Choose a file", type=["csv", "xlsx"], accept_multiple_files=True)
@@ -10,6 +11,8 @@ if x:
 
     data = pd.read_excel(x[0])
     data['line'] = data['unique_line'].apply(lambda x: x.split('_')[-1])
+    data['Direction'] = data['unique_line'].apply(lambda x: x.split('_')[2])
+
     st.dataframe(data.head())
 
     # d = st.slider('Chose station', 0, 41, value=(2, 8))
@@ -21,17 +24,27 @@ if x:
     # B
     result = pd.melt(data, id_vars=A, value_vars=B)
     hour_option = sorted(data['Hour'].unique().tolist())
+    directions = data['Direction'].unique().tolist()
+    print(directions)
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         line = st.selectbox('Choose a line', data['line'].unique().tolist())
 
     with col2:
         hour = st.selectbox('Choose an hour', hour_option, index=hour_option.index(8))
+    with col3:
+        print(333)
+        print(directions)
+        directions_2 = st.selectbox('Choose a direction', directions, index=0)
+    result_a = result[
+        (result['line'] == line) & (result['Hour'] == hour) & (result['Direction'] == directions_2)].reset_index(
+        drop=True)
+
     d = st.slider('Chose station', 0, 41, value=(2, 8))
 
-    result_a = result[(result['line'] == line) & (result['Hour'] == hour)].reset_index(drop=True)
+    # result_a=result[(result['line']==line)&(result['Hour']==hour)&(result_a['Direction']==directions_2)].reset_index(drop=True)
     result_a = result_a[(result_a['StopSequence'] >= d[0]) & (result_a['StopSequence'] <= d[1])].reset_index(drop=True)
 
     A = result_a[result_a['variable'] == 'Time_diff_90'].reset_index(drop=True)
@@ -164,9 +177,14 @@ if x:
     fig.update_layout(annotations=annotations)
     'Graph N 2'
     title = 'Less than 2 option'
-    fig_3 = px.line(x=data['StopSequence'], y=data['less_2'], title=title, text=data['less_2'].round(2))
+    result_a_g3 = result_a[['unique_line', 'StopSequence', 'less_2', 'Direction']].drop_duplicates()
+    result_a_g3.sort_values(by='StopSequence', inplace=True)
+
+    fig_3 = px.line(x=result_a_g3['StopSequence'], y=result_a_g3['less_2'], title=title,
+                    text=result_a_g3['less_2'].round(2))
     fig_3.update_layout(title={'x': 0.5, 'xanchor': 'center'})
     fig_3.update_traces(textposition='top center')  # Position of the labels
+    print(result_a_g3)
 
     options = st.multiselect(
         "Select graphs to grades or Percentage of arrivals :",
