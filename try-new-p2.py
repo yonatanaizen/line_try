@@ -72,7 +72,7 @@ if x:
                 title='Grade',
                 x=1.05,
                 xanchor='left',
-                y=-0.2,
+                y=0.5,
                 len=0.8,
                 thickness=15
             )
@@ -242,6 +242,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 
