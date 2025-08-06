@@ -2,8 +2,8 @@ import pandas as pd
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+
 import plotly.graph_objects as go
-from adodbapi.ado_consts import directions
 
 st.title("Reliability sketch")
 x = st.file_uploader("Choose a file", type=["csv", "xlsx"], accept_multiple_files=True)
@@ -242,6 +242,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 
