@@ -78,26 +78,26 @@ if x:
             )
         )
     )
-
-    bar_trace_50 = go.Bar(
-        name='50',
-        x=E['StopSequence'],
-        y=E['value'] - B['value'],
-        base=B['value'],
-        marker=dict(
-            color="white",   # White fill
-            line=dict(
-                color="blue",  # Blue outline for better visibility
-                width=1
+     bar_trace_50 = go.Bar(
+            name='50',
+            x=E['StopSequence'],
+            y=E['value'] - B['value'],
+            base=B['value'],
+            marker=dict(
+                color=E['grade'],
+                colorscale='Greens',
+                cmin=0,
+                cmax=100,
+                showscale=False  # Hide this second colorbar
+            ),
+            text=E['value'].round(),
+            textposition='inside',
+            textfont=dict(
+                size=12,  # Set the desired font size
+                color="black"  # Optional: set text color for readability
             )
-        ),
-        text=E['value'].round(),
-        textposition='inside',
-        textfont=dict(
-            size=12,
-            color="black"    # Adjust to suit visibility when background is white
         )
-    )
+
 
     bar_trace_20_80 = go.Bar(
         name='20-80',
