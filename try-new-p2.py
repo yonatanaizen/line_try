@@ -1,167 +1,230 @@
+import pandas as pd
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
 import plotly.express as px
+import plotly.graph_objects as go
 
 st.title("Reliability sketch")
+x = st.file_uploader("Choose a file", type=["csv", "xlsx"], accept_multiple_files=True)
+if x:
 
-x=st.file_uploader("Choose a file", type=["csv", "xlsx"], accept_multiple_files=True)
-y=st.file_uploader("Choose a seconds file", type=["csv", "xlsx"], accept_multiple_files=True)
+    data = pd.read_excel(x[0])
+    data['line'] = data['unique_line'].apply(lambda x: x.split('_')[-1])
+    st.dataframe(data.head())
 
-if x and y:
-    data=pd.read_excel(x[0])
-    data_2 = pd.read_excel(y[0])
+    # d = st.slider('Chose station', 0, 41, value=(2, 8))
+    #
+    # data = data[(data['StopSequence'] >= d[0]) & (data['StopSequence'] <= d[1])].reset_index(drop=True)
 
-    print(data.columns)
-# data=pd.read_excel(r"C:\Users\yonat\Downloads\77_08.xlsx")
-# print(data['unique_line'])
+    A = list(data.columns[:6]) + list(data.columns[-7:])
+    B = list(data.columns[6:-7])
+    # B
+    result = pd.melt(data, id_vars=A, value_vars=B)
+    hour_option = sorted(data['Hour'].unique().tolist())
 
-# line_options=['ALL']+data['unique_line'].unique().tolist()
-# col1, col2 = st.columns(2)
-#
-# # First dropdown (line selection)
-# with col1:
-#     selected_line = st.selectbox('Choose a line', line_options)
-#     if selected_line != 'ALL':
-#         data = data[data['unique_line'] == selected_line].reset_index(drop=True)
-#
-# # Second dropdown (hour selection)
-# with col2:
-#     hour_options = ['ALL'] + data['Hour'].unique().tolist()
-#     selected_hour = st.selectbox('Choose an Hour', hour_options)
-#     if selected_hour != 'ALL':
-#         data = data[data['Hour'] == selected_hour].reset_index(drop=True)
+    col1, col2 = st.columns(2)
 
+    with col1:
+        line = st.selectbox('Choose a line', data['line'].unique().tolist())
 
-# print(d)
-    st.dataframe(data)
-    d=st.slider('Chose station',0,41,value=(2, 8))
+    with col2:
+        hour = st.selectbox('Choose an hour', hour_option, index=hour_option.index(8))
+    d = st.slider('Chose station', 0, 41, value=(2, 8))
 
-    data=data[(data['StopSequence']>=d[0])&(data['StopSequence']<=d[1])].reset_index(drop=True)
+    result_a = result[(result['line'] == line) & (result['Hour'] == hour)].reset_index(drop=True)
+    result_a = result_a[(result_a['StopSequence'] >= d[0]) & (result_a['StopSequence'] <= d[1])].reset_index(drop=True)
 
-    data=data.sort_values(by=['StopSequence','exc']).reset_index(drop=True)
+    A = result_a[result_a['variable'] == 'Time_diff_90'].reset_index(drop=True)
+    B = result_a[result_a['variable'] == 'Time_diff_10'].reset_index(drop=True)
+    C = result_a[result_a['variable'] == 'Time_diff_80'].reset_index(drop=True)
+    D = result_a[result_a['variable'] == 'Time_diff_20'].reset_index(drop=True)
+    E = result_a[result_a['variable'] == 'Time_diff_50'].reset_index(drop=True)
+    F = result_a[result_a['variable'] == 'Time_diff_30'].reset_index(drop=True)
+    G = result_a[result_a['variable'] == 'Time_diff_70'].reset_index(drop=True)
+    H = result_a[result_a['variable'] == 'Time_diff_60'].reset_index(drop=True)
+    I = result_a[result_a['variable'] == 'Time_diff_40'].reset_index(drop=True)
 
-    # title = f'grade vs station Toatl grade for line {data['grade_H'].iloc[0].round(3)}'
-    fig=px.bar(x=data['StopSequence'],y=data['value'],color=data['variable'],text=data['RT'],title='line 77 Freq 20')
-    # fig.update_layout(    title={'x': 0.5,'xanchor': 'center'})
-    # fig.update_traces(textposition='top center')  # Position of the labels
+    # Create the bar trace
+    bar_trace_10_90_t = go.Bar(
+        name='10-90',
+        x=A['StopSequence'],
+        y=A['value'] - B['value'],
+        base=B['value'],
+        marker=dict(
+            color=A['grade'],
+            colorscale='Greens',
+            cmin=0,
+            cmax=100,
+            colorbar=dict(
+                title='Grade',
+                x=1.05,
+                xanchor='left',
+                y=-0.5,
+                len=0.8,
+                thickness=15
+            )
+        )
+    )
 
-    # st.plotly_chart(fig, use_container_width=True)
+    bar_trace_50 = go.Bar(
+        name='50',
+        x=E['StopSequence'],
+        y=E['value'] - B['value'],
+        base=B['value'],
+        marker=dict(
+            color=E['grade'],
+            colorscale='Greens',
+            cmin=0,
+            cmax=100,
+            showscale=False  # Hide this second colorbar
+        ),
+        text=E['value'].round(),
+        textposition='inside',
+        textfont=dict(
+            size=12,  # Set the desired font size
+            color="black"  # Optional: set text color for readability
+        )
+    )
 
+    bar_trace_20_80 = go.Bar(
+        name='20-80',
+        x=C['StopSequence'],
+        y=C['value'] - D['value'],
+        base=D['value'],
+        marker=dict(
+            color=D['grade'],
+            colorscale='Greens',
+            cmin=0,
+            cmax=100,
+            showscale=False  # Hide this second colorbar
+        ), visible='legendonly'
+        # Optional: set text color for readability
+    )
 
-#
-# title = f'Percentage of arrivals in less than 2 minutes'
-# fig_2=px.line(x=data['StopOrder'],y=data['less_2'],title=title,text=data['less_2'].round(2))
-# fig_2.update_layout(    title={'x': 0.5,'xanchor': 'center'})
-# fig_2.update_traces(textposition='top center')  # Position of the labels
-#
-#
-# options = st.multiselect(
-#     "Select graphs to grades or Percentage of arrivals :",
-#     ['Grades Scatter', 'Arivel line'],
-#     default=['Grades Scatter']
-# )
-# data=data.sort_values(by='StopOrder').reset_index(drop=True)
-#
-# if 'Grades Scatter' in options:
-#
-#     st.plotly_chart(fig, use_container_width=True)
-#
-# if 'Arivel line' in options:
-#     st.plotly_chart(fig_2, use_container_width=True)
+    bar_trace_30_70 = go.Bar(
+        name='30-70',
+        x=F['StopSequence'],
+        y=F['value'] - G['value'],
+        base=G['value'],
+        marker=dict(
+            color=G['grade'],
+            colorscale='Greens',
+            cmin=0,
+            cmax=100,
+            showscale=False  # Hide this second colorbar
+        ), visible='legendonly'
+        # Optional: set text color for readability
+    )
 
-# graph_col1, graph_col2 = st.columns(2)
-# with graph_col1:
-#     st.plotly_chart(fig, use_container_width=True)
-# with graph_col2:
-#     st.plotly_chart(fig_2, use_container_width=True)
-#
+    bar_trace_40_60 = go.Bar(
+        name='40-60',
+        x=H['StopSequence'],
+        y=H['value'] - I['value'],
+        base=I['value'],
+        marker=dict(
+            color=I['grade'],
+            colorscale='Greens',
+            cmin=0,
+            cmax=100,
+            showscale=False  # Hide this second colorbar
+        ), visible='legendonly'
+        # Optional: set text color for readability
+    )
 
-    a = data[data['variable'] == 'per_low'].reset_index(drop=True)
-    b = data[data['variable'] == 'per_up'].reset_index(drop=True)
-    # b['exc_diffrence'] = (b['exc'] - b['exc'].shift(1)) / b['exc'].shift(1)
-    b['exc_diffrence'] = (b['exc'].shift(-1)-b['exc']  ) / b['exc'].shift(-1)
+    # Create annotations below the base of each bar
+    annotations = [
+                      dict(
+                          x=A['StopSequence'].iloc[i],
+                          y=B['value'].iloc[i] - 2,  # 2 units below base
+                          text=str(round(B['value'].iloc[i])),
+                          showarrow=False,
+                          font=dict(color="black", size=12),
+                          yanchor="top"
+                      )
+                      for i in range(len(A))
+                  ] + [
+                      dict(
+                          x=A['StopSequence'].iloc[i],
+                          y=A['value'].iloc[i] + 6,  # 2 units below top
+                          text=str(round(A['value'].iloc[i])),
+                          showarrow=False,
+                          font=dict(color="black", size=12),
+                          yanchor="top"
+                      )
+                      for i in range(len(A))
+                  ]
 
-    b['Color'] = 'dodgerblue'
-    b.loc[b['exc_diffrence'] >= 0.15, 'Color'] = 'red'
-
-
-    # fig_2 = go.Figure()
-    from plotly.subplots import make_subplots
-
-    fig_2 = make_subplots(specs=[[{"secondary_y": True}]])
-
-    fig_2.add_trace(go.Bar(x=a['StopSequence'], y=b['exc'] - a['exc'],base=a['exc'],marker=dict(color=b['Color']),text=b['exc'], textposition='outside'  ),    secondary_y=False)
-
-    fig_2.update_layout( barmode='overlay',  title="Time distribution",    yaxis=dict(range=[0, max(b['exc'].max()+5, a['exc'].max())])  )
-    fig_2.add_trace(go.Bar(  x=a['StopSequence'],        y=b['exc'] - a['exc'],base=a['exc'],marker=dict(color=b['Color']),text=a['exc'],textposition='inside',     insidetextanchor='start'    ),    secondary_y=False  )
-
-    fig_2.add_trace(go.Scatter(x=a['StopSequence'],y=a['Grade'],text=a['Grade'],    mode="lines+text",textposition="top center",    line=dict(color='green')  ),secondary_y=True)
-
-    title = f'Percentage of arrivals in less than 2 minutes'
-
-    data_2=data_2[(data_2['StopSequence']>=d[0])&(data_2['StopSequence']<=d[1])].reset_index(drop=True)
-
-
-    fig_3 = px.line(x=data_2['StopSequence'], y=data_2['less_2'], title=title, text=data_2['less_2'].round(2))
+    max_y = A['value'].max()
+    # Plot the figure
+    fig = go.Figure(data=[bar_trace_10_90_t, bar_trace_50, bar_trace_20_80, bar_trace_30_70, bar_trace_40_60])
+    fig.update_layout(
+        barmode='stack',
+        yaxis=dict(range=[0, max_y + 8])
+    )
+    fig.update_layout(annotations=annotations)
+    'Graph N 2'
+    title = 'Less than 2 option'
+    fig_3 = px.line(x=data['StopSequence'], y=data['less_2'], title=title, text=data['less_2'].round(2))
     fig_3.update_layout(title={'x': 0.5, 'xanchor': 'center'})
     fig_3.update_traces(textposition='top center')  # Position of the labels
 
-    # st.plotly_chart(fig_2, use_container_width=True)
-
     options = st.multiselect(
         "Select graphs to grades or Percentage of arrivals :",
-        [ 'Minute line','Time arivel precentege','percent Scatter'],
+        ['Minute line', 'Arrival percentage'],
         default=['Minute line']
     )
-    # data = data.sort_values(by='StopOrder').reset_index(drop=True)
-
-    if 'percent Scatter' in options:
-        st.plotly_chart(fig, use_container_width=True)
 
     if 'Minute line' in options:
-        st.plotly_chart(fig_2, use_container_width=True)
-    if 'Time arivel precentege' in options:
+        st.plotly_chart(fig, use_container_width=True)
+    if 'Arrival percentage' in options:
         st.plotly_chart(fig_3, use_container_width=True)
 
-    data_b=data[['StopSequence','StopName','StopCode']].drop_duplicates().reset_index(drop=True).T
+# st.markdown(
+#         """
+#         <style>
+#         .stApp {
+#             /* Dark blue with grey tint and 80% opacity */
+#             background-color: rgba(20, 30, 50, 0.8);
+#             color: white;
+#             min-height: 100vh;
+#             padding: 1rem;
+#         }
+#         </style>
+#         """,
+#         unsafe_allow_html=True
+# )
 
-    st.dataframe(data_b)
-
-st.header('Methodology:')
-
-st.write('We compute two criteria: the first measures the difference between the 90th and 10th percentiles (0.9, 0.1) of consecutive arrivals, and the second calculates the difference between the 95th and 5th percentiles (0.95, 0.05) of the daily median.The final grade is calculated as 100 minus the average of these two criteria')
-
-st.markdown("""
-### Example:
-
-Suppose we have 1,000 arrivals in a day.  
-We create a vector of differences, sort it, and calculate the following percentiles:
-- 90th percentile: 90  
-- 10th percentile: 10  
-- 95th percentile: 95  
-- 5th percentile: 5  
-
-Now, we compute the differences:
-- 90th - 10th = 80  
-- 95th - 5th = 90  
-
-The final grade is calculated as:  
-**100 − average of the two differences = 100 − ((80 + 90) / 2) = 15**
-""")
+#
+# st.markdown(
+#     """
+#     <style>
+#     .stApp {
+#         /* Soft white background with a slight gradient for better aesthetics */
+#         background: linear-gradient(135deg, #ffffff, #f9f9f9);
+#         color: #333333;  /* Dark gray text for better readability */
+#         min-height: 100vh;
+#         padding: 1rem;
+#     }
+#     </style>
+#     """,
+#     unsafe_allow_html=True
+# )
 
 st.markdown(
-        """
-        <style>
-        .stApp {
-            /* Dark blue with grey tint and 80% opacity */
-            background-color: rgba(20, 30, 50, 0.8);
-            color: white;
-            min-height: 100vh;
-            padding: 1rem;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
+    """
+    <style>
+    .stApp {
+        /* Gentle gradient with soft teal and subtle green tones */
+        background: linear-gradient(135deg, #A8DADC, #457B9D);
+        color: #F1FAEE; /* Light muted cream text for readability */
+        min-height: 100vh;
+        padding: 1rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
 )
+
+
+
 
