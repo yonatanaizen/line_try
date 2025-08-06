@@ -85,17 +85,17 @@ if x:
         y=E['value'] - B['value'],
         base=B['value'],
         marker=dict(
-            color=E['grade'],
-            colorscale='Greens',
-            cmin=0,
-            cmax=100,
-            showscale=False  # Hide this second colorbar
+            color="white",   # White fill
+            line=dict(
+                color="blue",  # Blue outline for better visibility
+                width=1
+            )
         ),
         text=E['value'].round(),
         textposition='inside',
         textfont=dict(
-            size=12,  # Set the desired font size
-            color="black"  # Optional: set text color for readability
+            size=12,
+            color="black"    # Adjust to suit visibility when background is white
         )
     )
 
@@ -242,6 +242,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 
