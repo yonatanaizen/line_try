@@ -91,7 +91,7 @@ if x:
             showscale=False  # Hide this second colorbar
         ),
         text=E['value'].round(),
-        line=dict(color="white", width=1)  
+        line=dict(color="white", width=1),  
 
         textposition='inside',
         textfont=dict(
@@ -244,6 +244,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 
