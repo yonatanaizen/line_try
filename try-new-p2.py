@@ -11,6 +11,7 @@ if x:
     data = pd.read_excel(x[0])
     data['line'] = data['unique_line'].apply(lambda x: x.split('_')[-1])
     data['Direction'] = data['unique_line'].apply(lambda x: x.split('_')[2])
+    data['Alternative'] = data['unique_line'].apply(lambda x: x.split('_')[3])
 
     st.dataframe(data.head())
 
@@ -24,9 +25,10 @@ if x:
     result = pd.melt(data, id_vars=A, value_vars=B)
     hour_option = sorted(data['Hour'].unique().tolist())
     directions = data['Direction'].unique().tolist()
+    alter = data['Alternative'].unique().tolist()
     print(directions)
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3,col4 = st.columns(4)
 
     with col1:
         line = st.selectbox('Choose a line', data['line'].unique().tolist())
@@ -37,8 +39,10 @@ if x:
         print(333)
         print(directions)
         directions_2 = st.selectbox('Choose a direction', directions, index=0)
+    with col4:
+        alter = st.selectbox('Choose an alternative', alter, index=0)
     result_a = result[
-        (result['line'] == line) & (result['Hour'] == hour) & (result['Direction'] == directions_2)].reset_index(
+        (result['line'] == line) & (result['Hour'] == hour) & (result['Direction'] == directions_2)&(result['Alternative']==alter)].reset_index(
         drop=True)
 
     d = st.slider('Chose station', 0, 41, value=(2, 8))
@@ -64,7 +68,7 @@ if x:
         base=B['value'],
         marker=dict(
             color=A['grade'],
-            colorscale='Greens',
+            colorscale=[[0, 'red'], [1, 'green']],  # Custom color scale from green to red
             cmin=0,
             cmax=100,
             colorbar=dict(
@@ -89,7 +93,7 @@ if x:
         base=B['value'],
         marker=dict(
             color=E['grade'],  # Keep the bar fill color from the colorscale
-            colorscale='Greens',
+            colorscale=[[0, 'red'], [1, 'green']],
             cmin=0,
             cmax=100,
             showscale=False,  # Hide this color scale
@@ -113,7 +117,7 @@ if x:
         base=D['value'],
         marker=dict(
             color=D['grade'],
-            colorscale='Greens',
+            colorscale=[[0, 'red'], [1, 'green']],
             cmin=0,
             cmax=100,
             showscale=False,  # Hide this second colorbar
@@ -132,7 +136,7 @@ if x:
         base=G['value'],
         marker=dict(
             color=G['grade'],
-            colorscale='Greens',
+            colorscale=[[0, 'red'], [1, 'green']],
             cmin=0,
             cmax=100,
             showscale=False,  # Hide this second colorbar
@@ -151,7 +155,7 @@ if x:
         base=I['value'],
         marker=dict(
             color=I['grade'],
-            colorscale='Greens',
+            colorscale=[[0, 'red'], [1, 'green']],
             cmin=0,
             cmax=100,
             showscale=False,  # Hide this second colorbar
