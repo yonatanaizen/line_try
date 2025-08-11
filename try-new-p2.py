@@ -209,6 +209,9 @@ if x:
     fig_3.update_traces(textposition='top center')  # Position of the labels
     print(result_a_g3)
 
+    fig.update_layout(xaxis=dict(dtick=1))
+    fig_3.update_layout(xaxis=dict(dtick=1))
+
     options = st.multiselect(
         "Select graphs to grades or Percentage of arrivals :",
         ['Minute line', 'Arrival percentage'],
